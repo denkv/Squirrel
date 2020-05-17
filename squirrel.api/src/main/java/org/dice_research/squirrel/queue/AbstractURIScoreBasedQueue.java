@@ -1,6 +1,5 @@
 package org.dice_research.squirrel.queue;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -9,7 +8,7 @@ import org.dice_research.squirrel.Constants;
 import org.dice_research.squirrel.data.uri.CrawleableUri;
 
 /**
- * This abstract class has methods to obtain URI based on a scoring scheme.
+ * This abstract class manages has methods to obtain URI based on a scoring scheme.
  * Each of the classes implementing this class can have their own scoring scheme.
  */
 public abstract class AbstractURIScoreBasedQueue implements UriQueue, Comparator<CrawleableUri> {
