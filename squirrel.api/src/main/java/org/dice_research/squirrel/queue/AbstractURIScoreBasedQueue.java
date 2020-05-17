@@ -1,5 +1,6 @@
 package org.dice_research.squirrel.queue;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -52,7 +53,10 @@ public abstract class AbstractURIScoreBasedQueue implements UriQueue, Comparator
      * @return Returns a list of URIs which are sorted according to their score
      */
     public List<CrawleableUri> getNextUris() {
-        List<CrawleableUri> uriList = new ArrayList<>(queue);
+        List<CrawleableUri> uriList = new ArrayList<>();
+        while(!queue.isEmpty()){
+            uriList.add(queue.poll());
+        }
         return uriList;
     }
 
