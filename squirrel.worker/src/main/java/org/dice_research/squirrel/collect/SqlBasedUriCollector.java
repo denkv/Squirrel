@@ -48,10 +48,13 @@ public class SqlBasedUriCollector implements UriCollector,Closeable {
 
 //    protected static final String COUNT_URIS_QUERY = "SELECT COUNT(*) AS TOTAL FROM ? where uri = ?";
 
-    protected static final String CREATE_TABLE_QUERY = "CREATE TABLE ? (uri VARCHAR(1024), serial INT, data BLOB, PRIMARY KEY(uri,serial));";
+    protected static final String CREATE_TABLE_QUERY = "CREATE TABLE ? (uri VARCHAR(1024), serial INT, data BLOB, amount INT, PRIMARY KEY(uri,serial));";
     protected static final String DROP_TABLE_QUERY = "DROP TABLE ";
-    protected static final String INSERT_URI_QUERY_PART_1 = " INSERT INTO ";
-    protected static final String INSERT_URI_QUERY_PART_2 = "(uri,serial,data) VALUES(?,?,?)";
+    protected static final String INSERT_URI_QUERY_PART_1 = "MERGE INTO ";
+    protected static final String INSERT_URI_QUERY_PART_2 = " AS t USING (VALUES(CAST(? AS VARCHAR(1024)), CAST(? AS INT), CAST(? AS BLOB))) AS vals(uri, serial, data) ON t.uri=vals.uri AND t.serial=vals.serial"
+        + " WHEN MATCHED THEN UPDATE SET t.amount = t.amount + 1"
+        + " WHEN NOT MATCHED THEN INSERT (uri, serial, data, amount) VALUES(vals.uri, vals.serial, vals.data, 1)";
+
     // protected static final String CLEAR_TABLE_QUERY = "DELETE FROM uris";
     private static final String SELECT_TABLE_QUERY = "SELECT * FROM ? OFFSET ? FETCH NEXT ? ROWS ONLY ";
     private static final String TABLE_NAME_KEY = "URI_COLLECTOR_TABLE_NAME";
