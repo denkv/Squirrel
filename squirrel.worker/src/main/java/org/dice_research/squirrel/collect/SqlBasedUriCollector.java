@@ -59,7 +59,7 @@ public class SqlBasedUriCollector implements UriCollector,Closeable {
     private static final String SELECT_TABLE_QUERY = "SELECT * FROM ? OFFSET ? FETCH NEXT ? ROWS ONLY ";
     private static final String TABLE_NAME_KEY = "URI_COLLECTOR_TABLE_NAME";
     private static final int MAX_ALPHANUM_PART_OF_TABLE_NAME = 30;
-    private static final int DEFAULT_BUFFER_SIZE = 30;
+    private static final int DEFAULT_BUFFER_SIZE = 0;
     private static final Pattern TABLE_NAME_GENERATE_REGEX = Pattern.compile("[^0-9a-zA-Z]*");
     private long total_uris = 0;
     protected Connection dbConnection;
@@ -132,7 +132,7 @@ public class SqlBasedUriCollector implements UriCollector,Closeable {
 
                     PreparedStatement ps = dbConnection
                             .prepareStatement(SELECT_TABLE_QUERY.replaceFirst("\\?", tableName));
-                    return new SqlBasedIterator(ps);
+                    return new SqlBasedIterator(ps, serializer);
 
                 } catch (SQLException e) {
                     LOGGER.error("Exception while querying URIs from database({}). Returning empty Iterator.",

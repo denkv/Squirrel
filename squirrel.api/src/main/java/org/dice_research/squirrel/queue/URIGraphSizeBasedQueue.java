@@ -69,7 +69,7 @@ public class URIGraphSizeBasedQueue extends AbstractURIScoreBasedQueue {
     }
 
     protected float getURIScore(CrawleableUri uri) {
-        int uriScore = getGraphSize(uri.getUri().toString());
+        int uriScore = getSourceDuplicity(uri) + getGraphSize(uri.getUri().toString());
         if(uriScore == 0) {
             return 1;
         }
@@ -90,5 +90,12 @@ public class URIGraphSizeBasedQueue extends AbstractURIScoreBasedQueue {
             LOGGER.error("Exception occurred while querying Sparql for duplicity of URL", e);
         }
         return 0;
+    }
+
+    private int getSourceDuplicity(CrawleableUri uri) {
+        Object data = uri.getData(Constants.URI_SOURCE_DUPLICITY);
+        int count = data != null ? (int)data : 0;
+        LOGGER.info("getSourceDuplicity(<{}>) = {}", uri.getUri(), count);
+        return count;
     }
 }

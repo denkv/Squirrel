@@ -1,5 +1,10 @@
 package org.dice_research.squirrel.iterators;
 
+import java.io.IOException;
+import org.dice_research.squirrel.Constants;
+import org.dice_research.squirrel.data.uri.CrawleableUri;
+import org.dice_research.squirrel.data.uri.serialize.Serializer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +25,10 @@ public class SqlBasedIterator implements Iterator<byte[]> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SqlBasedIterator.class);
 
+    /**
+     * Serializer for CrawleableURI objects.
+     */
+    protected Serializer serializer;
     /**
      * Prepared statement used for the retrieval of results.
      */
@@ -49,8 +58,9 @@ public class SqlBasedIterator implements Iterator<byte[]> {
      */
     private int page = 100;
 
-    public SqlBasedIterator(PreparedStatement ps) {
+    public SqlBasedIterator(PreparedStatement ps, Serializer serializer) {
         this.ps = ps;
+        this.serializer = serializer;
         try {
             ps.setInt(1, start);
             ps.setInt(2, next);
@@ -75,7 +85,14 @@ public class SqlBasedIterator implements Iterator<byte[]> {
                 if (hasNext_unsecured()) {
                     start = start + 1;
                     consumed = true;
-                    return rs.getBytes(3);
+                    try {
+                        CrawleableUri curi = serializer.deserialize(rs.getBytes(3));
+                        curi.addData(Constants.URI_SOURCE_DUPLICITY, rs.getInt(4));
+                        return serializer.serialize(curi);
+                    } catch (IOException e) {
+                        LOGGER.warn("Exception while (de)serializing URI. Will return previously serialized data.", e);
+                        return rs.getBytes(3);
+                    }
                 } else {
                     return null;
                 }
