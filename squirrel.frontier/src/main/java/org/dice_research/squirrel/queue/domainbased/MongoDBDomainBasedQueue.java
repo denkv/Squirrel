@@ -238,6 +238,8 @@ public class MongoDBDomainBasedQueue extends AbstractDomainBasedQueue {
 
                 Document doc = uriDocs.next();
 
+                LOGGER.info("uri: {}, score: {}", serializer.deserialize(((Binary) doc.get("uri")).getData()), doc.get("score"));
+
                 listUris.add(serializer.deserialize(((Binary) doc.get("uri")).getData()));
 
             }
